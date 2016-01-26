@@ -124,3 +124,9 @@
 //}
 
 //module.exports = loadFromORM;
+module.exports = function (GraysQL) {
+  return {
+    loadFromORM(translator, options) {
+    }
+  };
+};
