@@ -1,10 +1,10 @@
-const ORMLoader = require('../src/orm-loader');
+const makeORMLoader = require('../src/orm-loader');
 
 
 describe('UNIT TESTS', function () {
   describe('ORMLoader', function () {
 
-    require('./unit/orm-loader')(ORMLoader);
+    require('./unit/orm-loader')(makeORMLoader);
 
   });
 });
