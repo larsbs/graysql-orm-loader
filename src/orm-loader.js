@@ -1,5 +1,6 @@
 'use strict';
 
+const pluralize = require('pluralize');
 const Utils = require('./utils');
 
 
@@ -23,7 +24,21 @@ module.exports = function (name, translator) {
     }
 
     function _getQueriesForModel(modelName, model) {
-      return {};
+      const findOne = {
+        type: Utils.capitalize(modelName),
+        args: {
+          id: { type: 'Int!' }
+        },
+        resolve: (root, args) => translator.resolveById(model, args.id)
+      };
+      const findAll = {
+        type: Utils.capitalize(modelName),
+        resolve: (root, args) => translator.resolveAll(model)
+      };
+      return {
+        [modelName.toLowerCase()]: findOne,
+        [pluralize(modelName.toLowerCase())]: findAll
+      };
     }
 
     function _getTypeFromModel(modelName, model) {
@@ -43,7 +58,7 @@ module.exports = function (name, translator) {
         const models = translator.getModels();  // { ModelName: [Object], ModelName2: [Object], ... }
 
         for (const modelName in models) {
-          this.registerType(_getTypeFromModel(modelName, models[modelName]));
+          const type = _getTypeFromModel(modelName, models[modelName]);
         }
       }
     };
