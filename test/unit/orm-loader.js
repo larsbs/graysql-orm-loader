@@ -1,5 +1,6 @@
 'use strict';
 
+const expect = require('chai').expect;
 const GraysQL = require('graysql');
 const graphql = require('graphql');
 const GraphQLUtils = require('graphql/utilities');
@@ -19,8 +20,13 @@ module.exports = function (ORMLoader) {
       GQL.use(ORMLoader);
     });
 
+    it('should accept an object as a translator', function () {
+      expect(GQL.loadFromORM.bind(GQL, 'asdfa')).to.throw(TypeError, /Expected translator to be an object/);
+      expect(GQL.loadFromORM.bind(GQL, null)).to.throw(TypeError, /Expected translator to be an object/);
+      expect(GQL.loadFromORM.bind(GQL, undefined)).to.throw(TypeError, /Expected translator to be an object/);
+    });
     it('should accept a valid translator', function () {
-      const InvalidTranslator = function () {};
+      function InvalidTranslator() {};
       expect(GQL.loadFromORM.bind(GQL, new InvalidTranslator())).to.throw(TypeError, /Invalid translator/);
       expect(GQL.loadFromORM.bind(GQL, new FakeTranslator(MockModels))).to.not.throw(TypeError, /Invalid translator/);
     });
