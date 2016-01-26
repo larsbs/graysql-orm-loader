@@ -1,0 +1,36 @@
+{
+  "name": "graysql-ext-orm-loader",
+  "version": "0.1.0",
+  "description": "A GraysQL extension to load a GraphQL schema from a ORM",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run lint && mocha --check-leaks -t 5000 test/index.js",
+    "cover": "npm run lint && istanbul cover _mocha -- --check-leaks -t 5000 -b -R spec test/index.js",
+    "lint": "eslint index.js src/"
+  },
+  "keywords": [
+    "graphql",
+    "graysql",
+    "graysql-extension"
+  ],
+  "author": "Lorenzo Ruiz <lars.bs@hotmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/larsbs/graysql.git"
+  },
+  "peerDependencies": {
+    "graysql": "^0.3.1"
+  },
+  "devDependencies": {
+    "chai": "^3.4.1",
+    "eslint": "^1.10.3",
+    "graphql": "^0.4.14",
+    "graphql-relay": "^0.3.6",
+    "istanbul": "^0.4.2",
+    "mocha": "^2.4.1"
+  },
+  "dependencies": {
+    "pluralize": "^1.2.1"
+  }
+}
