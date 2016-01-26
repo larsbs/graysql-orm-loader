@@ -1,5 +1,5 @@
 {
-  "name": "graysql-ext-orm-loader",
+  "name": "graysql-orm-loader",
   "version": "0.1.0",
   "description": "A GraysQL extension to load a GraphQL schema from a ORM",
   "main": "index.js",
@@ -13,7 +13,10 @@
     "graysql",
     "graysql-extension"
   ],
-  "author": "Lorenzo Ruiz <lars.bs@hotmail.com>",
+  "contributors": [
+    "Lorenzo Ruiz <lars.bs@hotmail.com>",
+    "José A. Jarana <joseajp@sindrosoft.com>"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",

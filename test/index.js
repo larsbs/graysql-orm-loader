@@ -1,5 +1,8 @@
 'use strict';
 
-describe('ORMLoader', function () {
+const ORMLoader = require('../src/orm-loader');
 
+
+describe('ORMLoader', function () {
+  require('./unit/orm-loader')(ORMLoader);
 });

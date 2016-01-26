@@ -1,43 +1,47 @@
 # GraysQL ORM Loader #
 
-GraysQL ORM Loader is an extension for [GraysQL]() which transforms your favorite ORM models into a compatible GraphQL Schema. In order to do the transformation, it needs an ORM translator.
-If your favorite ORM still not have a translator, you can build it yourself in a easy way.
+GraysQL ORM Loader is an extension for [GraysQL](https://github.com/larsbs/graysql) that transforms your existent ORM models/schema into a GraphQL Schema. In order to do the transformation, this extension needs an ORM translator. The
+translator will take care of the implementation details of the ORM and will get the data that ORM Loader needs.
 
+If the ORM that you use doesn't have a translator, you can build it yourself using the [Translators API]().
 
 ## Installation ##
 
-Install it from npm. Note that this is an extension for GraysQL, so you must have it installed in order to work.
+Install this package from npm using the following command:
 
 ```bash
-$ npm install graysql-orm-loader
+$ npm install graysql-ext-orm-loader
 ```
 
+Note that this is an extension for GraysQL, so you must have it installed in order for this to work.
 
-## Examples ##
+## Example ##
 
-Here is a simple example using [Sails.js]() with [Waterline]() as model provider.
+Here is a simple example using [Sails.js](http://sailsjs.org/) with [Waterline](https://github.com/balderdashy/waterline) as the ORM.
 
 ```javascript
 const GraysQL = require('graysql');
-const OrmLoader = require('graysql-orm-loader');
-const WaterlineTranslator = require('graysql-orm-waterline');
+const ORMLoader = require('graysql-orm-loader');
+const WaterlineTranslator = require('graysql-orm-loader-waterline');  // We'll use the waterline translator
 
 const GQL = new GraysQL();
 
 // Add the extension to GQL
-GQL.use(OrmLoader);
-// Create an instance of the translator and pass to it all the models
-// (in this case the object `sails.models` contains all waterline models)
+GQL.use(ORMLoader);
+
+// Instantiate the translator and pass the sails models.
 GQL.loadFromORM(new WaterlineTranslator(sails.models));
 
+// Generate the schema
 const Schema = GQL.generateSchema();
+console.log(Schema);
 ```
-
 
 ## Overview ##
 
 The main object in the GraysQL ORM Loader extension is a translator. A translator is a class that transforms a series of models of an ORM into compatible types, queries and mutations with [GraysQL]() in order to create a [GraphQL schema]().
 The automatically types, queries and mutations created are the following ones:
+
   * **Types**: A valid type for every model, including the relations betweens them.
   * **Queries**:
     * *getModelById(id)*: Get a model by its id.
@@ -65,29 +69,17 @@ This extension adds the following method to GraysQL.
     * `updateMutation: true|false`. This option indicates if a updateMutation must be created. By default *True*
     * `deleteMutation: true|false`. This option indicates if a deleteMutation must be created. By default *True*
 
-```javascript
-const GraysQL = require('graysql');
-const OrmLoader = require('graysql-orm-loader');
-const WaterlineTranslator = require('graysql-orm-waterline');
-
-const GQL = new GraysQL();
-
-
-GQL.use(OrmLoader);
-GQL.loadFromORM(new WaterlineTranslator(sails.models), {deleteMutation: False});
-```
-
-## Translator API ##
+## Translators API ##
 
 *TODO*
 
 ## Examples ##
 
-Usage examples can be found in [examples]() directory.
+An usage example can be found in [example](example) directory.
 
 ## Tests ##
 
-The tests are write with [mocha]() and can be runned with the following command:
+The tests are written with [mocha](https://mochajs.org) and can be run with the following command:
 
 ```bash
 $ npm test
@@ -95,4 +87,4 @@ $ npm test
 
 ## License ##
 
-[MIT]()
+[MIT](LICENSE)
