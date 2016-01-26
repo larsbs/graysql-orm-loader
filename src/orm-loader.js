@@ -16,15 +16,35 @@ module.exports = function (name, translator) {
     throw new TypeError(`Invalid translator received. A translator must implement the Translators API.`);
   }
 
-  return function LoadFromORM(GraysQL) {
-    const _translator = translator;
+  return GraysQL => {
+
+    function _getMutationsForModel(modelName, model) {
+      return {};
+    }
+
+    function _getQueriesForModel(modelName, model) {
+      return {};
+    }
+
+    function _getTypeFromModel(modelName, model) {
+      const modelProperties = translator.getModelProperties(model);
+      const modelAssociations = translator.getModelAssociations(model);
+
+      return GQL => ({
+        name: Utils.capitalize(modelName),
+        fields: Object.assign(modelProperties, modelAssociations),
+        queries: _getQueriesForModel(modelName, model),
+        mutations: _getMutationsForModel(modelName, model)
+      });
+    }
 
     return {
-      ['loadFrom' + name + 'ORM'](options) {
-        //const models = translator.getModels();  // { ModelName: [Object], ModelName2: [Object], ... }
-        //for (const modelName in models) {
-          //this.registerType(_getTypeFromModel(modelName, models[modelName]));
-        //}
+      ['loadFrom' + Utils.capitalize(name) + 'ORM'](options) {
+        const models = translator.getModels();  // { ModelName: [Object], ModelName2: [Object], ... }
+
+        for (const modelName in models) {
+          this.registerType(_getTypeFromModel(modelName, models[modelName]));
+        }
       }
     };
 

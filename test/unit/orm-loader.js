@@ -27,6 +27,12 @@ module.exports = function (makeORMLoader) {
       expect(() => makeORMLoader('', new FakeTranslator(MockModels))).to.throw(TypeError, /Expected name to be a string/);
     });
 
+    it('should accept a valid translator', function () {
+      function InvalidTranslator() {};
+      expect(() => makeORMLoader('Invalid', new InvalidTranslator())).to.throw(TypeError, /Invalid translator/);
+      expect(() => makeORMLoader('Fake', new FakeTranslator(MockModels))).to.not.throw(TypeError, /Invalid translator/);
+    });
+
     describe('#loadFromORM(translator, [options])', function () {
 
       let GQL;
@@ -35,13 +41,8 @@ module.exports = function (makeORMLoader) {
         GQL.use(makeORMLoader('Fake', new FakeTranslator(MockModels)));
       });
 
-      it.skip('should accept a valid translator', function () {
-        function InvalidTranslator() {};
-        expect(GQL.loadFromORM.bind(GQL, new InvalidTranslator())).to.throw(TypeError, /Invalid translator/);
-        expect(GQL.loadFromORM.bind(GQL, new FakeTranslator(MockModels))).to.not.throw(TypeError, /Invalid translator/);
-      });
-      it.skip('should generate a complete schema', function () {
-        GQL.loadFromORM(new FakeTranslator(MockModels));
+      it('should generate a complete schema', function () {
+        GQL.loadFromFakeORM();
         const expected = GraphQLUtils.printSchema(GQL.generateSchema());
         const result = GraphQLUtils.printSchema(TestSchema.Schema);
         expect(result).to.equal(expected);
