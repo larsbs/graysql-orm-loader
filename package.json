@@ -31,7 +31,7 @@
     "graphql": "^0.4.14",
     "graphql-relay": "^0.3.6",
     "istanbul": "^0.4.2",
-    "mocha": "^2.4.1"
+    "mocha": "^2.3.4"
   },
   "dependencies": {
     "pluralize": "^1.2.1"
