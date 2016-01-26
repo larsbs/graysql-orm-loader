@@ -19,21 +19,21 @@ module.exports = function (name, translator) {
 
   return GraysQL => {
 
-    function _getMutationsForModel(modelName, model) {
+    function _getMutationsForModel(modelName) {
       return {};
     }
 
-    function _getQueriesForModel(modelName, model) {
+    function _getQueriesForModel(modelName) {
       const findOne = {
         type: Utils.capitalize(modelName),
         args: {
           id: { type: 'Int!' }
         },
-        resolve: (root, args) => translator.resolveById(model, args.id)
+        resolve: (root, args) => translator.resolveById(modelName, args.id)
       };
       const findAll = {
         type: Utils.capitalize(modelName),
-        resolve: (root, args) => translator.resolveAll(model)
+        resolve: (root, args) => translator.resolveAll(modelName)
       };
       return {
         [modelName.toLowerCase()]: findOne,
@@ -41,24 +41,24 @@ module.exports = function (name, translator) {
       };
     }
 
-    function _getTypeFromModel(modelName, model) {
-      const modelProperties = translator.getModelProperties(model);
-      const modelAssociations = translator.getModelAssociations(model);
+    function _getTypeFromModel(modelName) {
+      const modelProperties = translator.getModelProperties(modelName);
+      const modelAssociations = translator.getModelAssociations(modelName);
 
       return GQL => ({
         name: Utils.capitalize(modelName),
         fields: Object.assign(modelProperties, modelAssociations),
-        queries: _getQueriesForModel(modelName, model),
-        mutations: _getMutationsForModel(modelName, model)
+        queries: _getQueriesForModel(modelName),
+        mutations: _getMutationsForModel(modelName)
       });
     }
 
     return {
       ['loadFrom' + Utils.capitalize(name) + 'ORM'](options) {
-        const models = translator.getModels();  // { ModelName: [Object], ModelName2: [Object], ... }
+        const modelsNames = translator.getModelsNames();  // [ ModelName, ModelName2, ... ]
 
-        for (const modelName in models) {
-          const type = _getTypeFromModel(modelName, models[modelName]);
+        for (const modelName of modelsNames) {
+          const type = _getTypeFromModel(modelName);
         }
       }
     };

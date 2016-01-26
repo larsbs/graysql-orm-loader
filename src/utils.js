@@ -1,7 +1,7 @@
 module.exports = {
   isValidTranslator(translator) {
     const mustKeys = [
-      'getModels',
+      'getModelsNames',
       'getModelProperties',
       'getModelAssociations'
     ];

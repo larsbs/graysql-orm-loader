@@ -5,7 +5,7 @@ const GraysQL = require('graysql');
 const graphql = require('graphql');
 const GraphQLUtils = require('graphql/utilities');
 
-const FakeTranslator = require('../support/fake-translator');
+const MockTranslator = require('../support/mock-translator');
 const MockModels = require('../support/mock-models');
 const TestSchema = require('../support/test-schema');
 
@@ -21,16 +21,16 @@ module.exports = function (makeORMLoader) {
     });
 
     it('should only accept a string as name', function () {
-      expect(() => makeORMLoader({}, new FakeTranslator(MockModels))).to.throw(TypeError, /Expected name to be a string/);
-      expect(() => makeORMLoader(null, new FakeTranslator(MockModels))).to.throw(TypeError, /Expected name to be a string/);
-      expect(() => makeORMLoader(undefined, new FakeTranslator(MockModels))).to.throw(TypeError, /Expected name to be a string/);
-      expect(() => makeORMLoader('', new FakeTranslator(MockModels))).to.throw(TypeError, /Expected name to be a string/);
+      expect(() => makeORMLoader({}, new MockTranslator(MockModels))).to.throw(TypeError, /Expected name to be a string/);
+      expect(() => makeORMLoader(null, new MockTranslator(MockModels))).to.throw(TypeError, /Expected name to be a string/);
+      expect(() => makeORMLoader(undefined, new MockTranslator(MockModels))).to.throw(TypeError, /Expected name to be a string/);
+      expect(() => makeORMLoader('', new MockTranslator(MockModels))).to.throw(TypeError, /Expected name to be a string/);
     });
 
     it('should accept a valid translator', function () {
       function InvalidTranslator() {};
       expect(() => makeORMLoader('Invalid', new InvalidTranslator())).to.throw(TypeError, /Invalid translator/);
-      expect(() => makeORMLoader('Fake', new FakeTranslator(MockModels))).to.not.throw(TypeError, /Invalid translator/);
+      expect(() => makeORMLoader('Mock', new MockTranslator(MockModels))).to.not.throw(TypeError, /Invalid translator/);
     });
 
     describe('#loadFromORM(translator, [options])', function () {
@@ -38,17 +38,17 @@ module.exports = function (makeORMLoader) {
       let GQL;
       beforeEach(function () {
         GQL = new GraysQL();
-        GQL.use(makeORMLoader('Fake', new FakeTranslator(MockModels)));
+        GQL.use(makeORMLoader('Mock', new MockTranslator(MockModels)));
       });
 
       it('should generate a complete schema', function () {
-        GQL.loadFromFakeORM();
+        GQL.loadFromMockORM();
         const expected = GraphQLUtils.printSchema(GQL.generateSchema());
         const result = GraphQLUtils.printSchema(TestSchema.Schema);
         expect(result).to.equal(expected);
       });
       it.skip('should generate a valid schema', function (done) {
-        GQL.loadFromORM(new FakeTranslator(MockModels));
+        GQL.loadFromORM(new MockTranslator(MockModels));
         const Schema = GQL.generateSchema();
         const query = `query getUser {
           user(id: 1) {
