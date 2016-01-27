@@ -13,12 +13,24 @@ function parseTypeToGraysQL(type) {
   }
 }
 
-function parseRelationshipToGraysQL(relationship) {
+function parseRelationshipUsingRelay(key, relationship) {
+  return {
+    type: `@${relationship.hasMany}`,
+    resolve: (root, args) => root[key]
+  }
+}
+
+function parseRelationshipToGraysQL(key, relationship, useRelay) {
   if (relationship.hasOwnProperty('belongsTo')) {
     return { type: relationship.belongsTo };
   }
   else if (relationship.hasOwnProperty('hasMany')){
-    return { type: `[${relationship.hasMany}]`};
+    if (useRelay) {
+      return parseRelationshipUsingRelay(key, relationship);
+    }
+    else {
+      return { type: `[${relationship.hasMany}]`};
+    }
   }
 }
 
@@ -44,11 +56,11 @@ class MockTranslator {
     return properties;
   }
 
-  parseModelAssociations(modelName) {
+  parseModelAssociations(modelName, useRelay) {
     const model = this._models[modelName];
     const properties = {};
     for (const key in model.relationships) {
-      properties[key] = parseRelationshipToGraysQL(model.relationships[key]);
+      properties[key] = parseRelationshipToGraysQL(key, model.relationships[key], useRelay);
     }
     return properties;
   }
@@ -90,6 +102,14 @@ class MockTranslator {
   }
 
   resolveDelete(modelName) {
+  }
+
+  resolveNodeId(modelName) {
+    return id => this._models[modelName].findById(id);
+  }
+
+  resolveIsTypeOf(modelName) {
+    return obj => obj instanceof this._models[modelName].model;
   }
 
 }

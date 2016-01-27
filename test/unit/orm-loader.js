@@ -2,6 +2,7 @@
 
 const expect = require('chai').expect;
 const GraysQL = require('graysql');
+const Graylay = require('graysql/extensions/graylay');
 const graphql = require('graphql');
 const GraphQLUtils = require('graphql/utilities');
 
@@ -85,14 +86,16 @@ module.exports = function (makeORMLoader) {
         .catch(err => done(err));
       });
       it('should generate a complete relay schema when options.relay is true', function () {
-        GQL.loadFromMockORM();
+        GQL.use(Graylay);
+        GQL.loadFromMockORM({ relay: true });
         const Schema = GQL.generateSchema();
         const expected = GraphQLUtils.printSchema(TestSchemaRelay.Schema);
         const result = GraphQLUtils.printSchema(Schema);
         expect(result).to.equal(expected);
       });
       it('should generate a valid schema when options.relay is true', function (done) {
-        GQL.loadFromMockORM();
+        GQL.use(Graylay);
+        GQL.loadFromMockORM({ relay: true });
         const Schema = GQL.generateSchema();
         const query = `query GetGroup {
           group(id: 1) {
@@ -131,7 +134,7 @@ module.exports = function (makeORMLoader) {
         };
         graphql.graphql(Schema, query)
           .then(result => {
-            expect(result).to.equal(expected);
+            expect(result).to.deep.equal(expected);
             done();
           })
           .catch(err => done(err));

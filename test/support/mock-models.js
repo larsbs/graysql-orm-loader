@@ -14,6 +14,7 @@ module.exports = {
         hasMany: 'User'
       }
     },
+    model: DB.Group,
     findById(id) {
       return DB.getGroup(id);
     },
@@ -31,6 +32,7 @@ module.exports = {
         belongsTo: 'Group'
       }
     },
+    model: DB.User,
     findById(id) {
       return DB.getUser(id);
     },

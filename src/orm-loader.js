@@ -80,20 +80,34 @@ module.exports = function (name, translator) {
 
     function _getTypeFromModel(modelName, options) {
       const modelProperties = translator.parseModelProperties(modelName);
-      const modelAssociations = translator.parseModelAssociations(modelName);
+      const modelAssociations = translator.parseModelAssociations(modelName, options.relay);
 
-      return (/* GQL */) => ({
+      let type = {
         name: Utils.capitalize(modelName),
         fields: Object.assign({}, modelProperties, modelAssociations),
         queries: _getQueriesForModel(modelName),
         mutations: _getMutationsForModel(modelName, options.mutations)
-      });
+      };
+
+      if (options.relay) {
+        type = Object.assign({}, type, {
+          interfaces: ['Node'],
+          nodeId: translator.resolveNodeId(modelName),
+          isTypeOf: translator.resolveIsTypeOf(modelName)
+        });
+      }
+
+      return (/* GQL */) => type;
     }
 
     return {
       ['loadFrom' + Utils.capitalize(name) + 'ORM'](opts) {
         const modelsNames = translator.getModelsNames();  // [ ModelName, ModelName2, ... ]
         const options = _setDefaults(opts);
+
+        if (options.relay) {
+          // TODO: Add a method to check if Graylay is enabled, and if not, throw an Error
+        }
 
         for (const modelName of modelsNames) {
           const type = _getTypeFromModel(modelName, options);
