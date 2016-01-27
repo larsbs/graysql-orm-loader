@@ -43,8 +43,8 @@ module.exports = function (makeORMLoader) {
 
       it('should generate a complete schema', function () {
         GQL.loadFromMockORM();
-        const expected = GraphQLUtils.printSchema(GQL.generateSchema());
-        const result = GraphQLUtils.printSchema(TestSchema.Schema);
+        const expected = GraphQLUtils.printSchema(TestSchema.Schema);
+        const result = GraphQLUtils.printSchema(GQL.generateSchema());
         expect(result).to.equal(expected);
       });
       it.skip('should generate a valid schema', function (done) {

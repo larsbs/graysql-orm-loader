@@ -1,5 +1,7 @@
 'use strict';
 
+const deepFreeze = require('deep-freeze');
+
 
 function parseTypeToGraysQL(type) {
   switch(type) {
@@ -10,11 +12,20 @@ function parseTypeToGraysQL(type) {
   }
 }
 
+function parseRelationshipToGraysQL(relationship) {
+  if (relationship.hasOwnProperty('belongsTo')) {
+    return { type: relationship.belongsTo };
+  }
+  else if (relationship.hasOwnProperty('hasMany')){
+    return { type: `[${relationship.hasMany}]`};
+  }
+}
+
 
 class MockTranslator {
 
   constructor(models) {
-    this._models = models;
+    this._models = deepFreeze(models);
   }
 
   getModelsNames() {
@@ -25,14 +36,57 @@ class MockTranslator {
     const model = this._models[modelName];
     const properties = {};
     for (const key in model.attributes) {
-      properties[key] = Object.assign(model.attributes[key], {
+      properties[key] = Object.assign({}, model.attributes[key], {
         type: parseTypeToGraysQL(model.attributes[key].type)
       });
     }
     return properties;
   }
 
-  parseModelAssociations() {
+  parseModelAssociations(modelName) {
+    const model = this._models[modelName];
+    const properties = {};
+    for (const key in model.relationships) {
+      properties[key] = parseRelationshipToGraysQL(model.relationships[key]);
+    }
+    return properties;
+  }
+
+  getArgsForCreate(modelName) {
+    const args = this.parseModelProperties(modelName);
+    delete args.id;
+    for (const key in args) {
+      args[key].type = args[key].type + '!';
+    }
+    return args;
+  }
+
+  getArgsForUpdate(modelName) {
+    const args = this.parseModelProperties(modelName);
+    for (const key in args) {
+      args[key].type = args[key].type + '!';
+    }
+    return args;
+  }
+
+  getArgsForDelete(modelName) {
+    const args = this.parseModelProperties(modelName);
+    return { id: { type: args.id.type + '!' }};
+  }
+
+  resolveById(modelName) {
+  }
+
+  resolveAll(modelName) {
+  }
+
+  resolveCreate(modelName) {
+  }
+
+  resolveUpdate(modelName) {
+  }
+
+  resolveDelete(modelName) {
   }
 
 }

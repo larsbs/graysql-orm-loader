@@ -4,21 +4,11 @@ const graphql = require('graphql');
 const DB = require('./db');
 
 
-const Employee = new graphql.GraphQLInterfaceType({
-  name: 'Employee',
-  fields: () => ({
-    employeeId: { type: graphql.GraphQLString }
-  })
-});
-
-
 const User = new graphql.GraphQLObjectType({
   name: 'User',
-  interfaces: () => [Employee],
   isTypeOf: obj => obj instanceof DB.User,
   fields: () => ({
     id: { type: graphql.GraphQLInt },
-    employeeId: { type: graphql.GraphQLString },
     nick: { type: graphql.GraphQLString },
     group: { type: Group }
   })
@@ -41,9 +31,13 @@ const Query = new graphql.GraphQLObjectType({
     group: {
       type: Group,
       args: {
-        id: { type: graphql.GraphQLInt }
+        id: { type: new graphql.GraphQLNonNull(graphql.GraphQLInt) }
       },
       resolve: (_, args) => DB.getGroup(args.id)
+    },
+    groups: {
+      type: Group,
+      resolve: (_, args) => DB.getGroups()
     },
     user: {
       type: User,
@@ -51,6 +45,10 @@ const Query = new graphql.GraphQLObjectType({
         id: { type: new graphql.GraphQLNonNull(graphql.GraphQLInt) }
       },
       resolve: (_, args) => DB.getUser(args.id)
+    },
+    users: {
+      type: User,
+      resolve: (_, args) => DB.getUsers()
     }
   })
 });
@@ -59,12 +57,49 @@ const Query = new graphql.GraphQLObjectType({
 const Mutation = new graphql.GraphQLObjectType({
   name: 'Mutation',
   fields: () => ({
+    createGroup: {
+      type: Group,
+      args: {
+        name: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) }
+      },
+      resolve: (_, args) => ({ id: 5, nick: args.name })
+    },
+    updateGroup: {
+      type: Group,
+      args: {
+        id: { type: new graphql.GraphQLNonNull(graphql.GraphQLInt) },
+        name: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) }
+      },
+      resolve: (_, args) => ({ id: args.id, name: args.name })
+    },
+    deleteGroup: {
+      type: Group,
+      args: {
+        id: { type: new graphql.GraphQLNonNull(graphql.GraphQLInt) },
+      },
+      resolve: (_, args) => DB.getGroup(args.id)
+    },
     createUser: {
       type: User,
       args: {
         nick: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) }
       },
       resolve: (_, args) => ({ id: 5, nick: args.nick })
+    },
+    updateUser: {
+      type: User,
+      args: {
+        id: { type: new graphql.GraphQLNonNull(graphql.GraphQLInt) },
+        nick: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) }
+      },
+      resolve: (_, args) => ({ id: args.id, nick: args.nick })
+    },
+    deleteUser: {
+      type: User,
+      args: {
+        id: { type: new graphql.GraphQLNonNull(graphql.GraphQLInt) },
+      },
+      resolve: (_, args) => DB.getUser(args.id)
     }
   })
 });

@@ -20,7 +20,26 @@ module.exports = function (name, translator) {
   return GraysQL => {
 
     function _getMutationsForModel(modelName) {
-      return {};
+      const createObj = {
+        type: Utils.capitalize(modelName),
+        args: translator.getArgsForCreate(modelName),
+        resolve: translator.resolveCreate(modelName)
+      };
+      const updateObj = {
+        type: Utils.capitalize(modelName),
+        args: translator.getArgsForUpdate(modelName),
+        resolve: translator.resolveUpdate(modelName)
+      };
+      const deleteObj = {
+        type: Utils.capitalize(modelName),
+        args: translator.getArgsForDelete(modelName),
+        resolve: translator.resolveDelete(modelName)
+      };
+      return {
+        [`create${Utils.capitalize(modelName)}`]: createObj,
+        [`update${Utils.capitalize(modelName)}`]: updateObj,
+        [`delete${Utils.capitalize(modelName)}`]: deleteObj
+      };
     }
 
     function _getQueriesForModel(modelName) {
@@ -29,11 +48,11 @@ module.exports = function (name, translator) {
         args: {
           id: { type: 'Int!' }
         },
-        resolve: (root, args) => translator.resolveById(modelName, args.id)
+        resolve: translator.resolveById(modelName)
       };
       const findAll = {
         type: Utils.capitalize(modelName),
-        resolve: (root, args) => translator.resolveAll(modelName)
+        resolve: translator.resolveAll(modelName)
       };
       return {
         [modelName.toLowerCase()]: findOne,
@@ -59,7 +78,6 @@ module.exports = function (name, translator) {
 
         for (const modelName of modelsNames) {
           const type = _getTypeFromModel(modelName);
-          console.dir(type(this), 4);
           this.registerType(type);
         }
       }

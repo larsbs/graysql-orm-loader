@@ -1,17 +1,6 @@
 'use strict';
 
 module.exports = {
-  User: {
-    attributes: {
-      id: { type: 'Integer' },
-      nick: { type: 'String' }
-    },
-    relationships: {
-      group: {
-        belongsTo: 'Group'
-      }
-    }
-  },
   Group: {
     attributes: {
       id: { type: 'Integer' },
@@ -20,6 +9,17 @@ module.exports = {
     relationships: {
       members: {
         hasMany: 'User'
+      }
+    }
+  },
+  User: {
+    attributes: {
+      id: { type: 'Integer' },
+      nick: { type: 'String' }
+    },
+    relationships: {
+      group: {
+        belongsTo: 'Group'
       }
     }
   }
