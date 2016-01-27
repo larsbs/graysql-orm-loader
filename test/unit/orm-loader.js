@@ -8,6 +8,7 @@ const GraphQLUtils = require('graphql/utilities');
 const MockTranslator = require('../support/mock-translator');
 const MockModels = require('../support/mock-models');
 const TestSchema = require('../support/test-schema');
+const TestSchemaRelay = require('../support/test-schema-relay');
 
 
 module.exports = function (makeORMLoader) {
@@ -33,7 +34,7 @@ module.exports = function (makeORMLoader) {
       expect(() => makeORMLoader('Mock', new MockTranslator(MockModels))).to.not.throw(TypeError, /Invalid translator/);
     });
 
-    describe('#loadFromORM(translator, [options])', function () {
+    describe('#loadFromORM([options])', function () {
 
       let GQL;
       beforeEach(function () {
@@ -83,8 +84,58 @@ module.exports = function (makeORMLoader) {
         })
         .catch(err => done(err));
       });
-      it('should generate a complete relay schema when options.relay is true');
-      it('should generate a valid schema when options.relay is true');
+      it('should generate a complete relay schema when options.relay is true', function () {
+        GQL.loadFromMockORM();
+        const Schema = GQL.generateSchema();
+        const expected = GraphQLUtils.printSchema(TestSchemaRelay.Schema);
+        const result = GraphQLUtils.printSchema(Schema);
+        expect(result).to.equal(expected);
+      });
+      it('should generate a valid schema when options.relay is true', function (done) {
+        GQL.loadFromMockORM();
+        const Schema = GQL.generateSchema();
+        const query = `query GetGroup {
+          group(id: 1) {
+            id,
+            name,
+            members {
+              edges {
+                node {
+                  id,
+                  nick
+                }
+              }
+            }
+          }
+        }`;
+        const expected = {
+          data: {
+            group: {
+              id: "R3JvdXA6MQ==",
+              name: "Group 1",
+              members: {
+                edges: [{
+                  node: {
+                    id: "VXNlcjox",
+                    nick: "Lars"
+                  }
+                }, {
+                  node: {
+                    id: "VXNlcjoy",
+                    nick: "Deathvoid"
+                  }
+                }]
+              }
+            }
+          }
+        };
+        graphql.graphql(Schema, query)
+          .then(result => {
+            expect(result).to.equal(expected);
+            done();
+          })
+          .catch(err => done(err));
+      });
       it('should not generate create mutations when options.mutations.create is false', function () {
         GQL.loadFromMockORM({
           mutations: {
