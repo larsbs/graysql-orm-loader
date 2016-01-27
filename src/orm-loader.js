@@ -42,12 +42,12 @@ module.exports = function (name, translator) {
     }
 
     function _getTypeFromModel(modelName) {
-      const modelProperties = translator.getModelProperties(modelName);
-      const modelAssociations = translator.getModelAssociations(modelName);
+      const modelProperties = translator.parseModelProperties(modelName);
+      const modelAssociations = translator.parseModelAssociations(modelName);
 
       return GQL => ({
         name: Utils.capitalize(modelName),
-        fields: Object.assign(modelProperties, modelAssociations),
+        fields: Object.assign({}, modelProperties, modelAssociations),
         queries: _getQueriesForModel(modelName),
         mutations: _getMutationsForModel(modelName)
       });
@@ -59,6 +59,8 @@ module.exports = function (name, translator) {
 
         for (const modelName of modelsNames) {
           const type = _getTypeFromModel(modelName);
+          console.dir(type(this), 4);
+          this.registerType(type);
         }
       }
     };

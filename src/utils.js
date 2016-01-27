@@ -2,8 +2,8 @@ module.exports = {
   isValidTranslator(translator) {
     const mustKeys = [
       'getModelsNames',
-      'getModelProperties',
-      'getModelAssociations'
+      'parseModelProperties',
+      'parseModelAssociations'
     ];
     for (const key of mustKeys) {
       if ( ! translator[key]) {
