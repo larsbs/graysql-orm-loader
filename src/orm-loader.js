@@ -19,27 +19,45 @@ module.exports = function (name, translator) {
 
   return (/* GraysQL */) => {
 
-    function _getMutationsForModel(modelName) {
-      const createObj = {
-        type: Utils.capitalize(modelName),
-        args: translator.getArgsForCreate(modelName),
-        resolve: translator.resolveCreate(modelName)
-      };
-      const updateObj = {
-        type: Utils.capitalize(modelName),
-        args: translator.getArgsForUpdate(modelName),
-        resolve: translator.resolveUpdate(modelName)
-      };
-      const deleteObj = {
-        type: Utils.capitalize(modelName),
-        args: translator.getArgsForDelete(modelName),
-        resolve: translator.resolveDelete(modelName)
-      };
-      return {
-        [`create${Utils.capitalize(modelName)}`]: createObj,
-        [`update${Utils.capitalize(modelName)}`]: updateObj,
-        [`delete${Utils.capitalize(modelName)}`]: deleteObj
-      };
+    function _setDefaults(options) {
+      options = Object.assign({
+        relay: false,
+        mutations: {}
+      }, options);
+      options.mutations = Object.assign({
+        create: true,
+        update: true,
+        delete: true
+      }, options.mutations);
+      return options;
+    }
+
+    function _getMutationsForModel(modelName, mutationsOptions) {
+      const mutations = {};
+
+      if (mutationsOptions.create) {
+        mutations[`create${Utils.capitalize(modelName)}`] = {
+          type: Utils.capitalize(modelName),
+          args: translator.getArgsForCreate(modelName),
+          resolve: translator.resolveCreate(modelName)
+        };
+      }
+      if (mutationsOptions.update) {
+        mutations[`update${Utils.capitalize(modelName)}`] = {
+          type: Utils.capitalize(modelName),
+          args: translator.getArgsForUpdate(modelName),
+          resolve: translator.resolveUpdate(modelName)
+        };
+      }
+      if (mutationsOptions.delete) {
+        mutations[`delete${Utils.capitalize(modelName)}`] = {
+          type: Utils.capitalize(modelName),
+          args: translator.getArgsForDelete(modelName),
+          resolve: translator.resolveDelete(modelName)
+        };
+      }
+
+      return mutations;
     }
 
     function _getQueriesForModel(modelName) {
@@ -60,7 +78,7 @@ module.exports = function (name, translator) {
       };
     }
 
-    function _getTypeFromModel(modelName) {
+    function _getTypeFromModel(modelName, options) {
       const modelProperties = translator.parseModelProperties(modelName);
       const modelAssociations = translator.parseModelAssociations(modelName);
 
@@ -68,16 +86,17 @@ module.exports = function (name, translator) {
         name: Utils.capitalize(modelName),
         fields: Object.assign({}, modelProperties, modelAssociations),
         queries: _getQueriesForModel(modelName),
-        mutations: _getMutationsForModel(modelName)
+        mutations: _getMutationsForModel(modelName, options.mutations)
       });
     }
 
     return {
-      ['loadFrom' + Utils.capitalize(name) + 'ORM'](options) {
+      ['loadFrom' + Utils.capitalize(name) + 'ORM'](opts) {
         const modelsNames = translator.getModelsNames();  // [ ModelName, ModelName2, ... ]
+        const options = _setDefaults(opts);
 
         for (const modelName of modelsNames) {
-          const type = _getTypeFromModel(modelName);
+          const type = _getTypeFromModel(modelName, options);
           this.registerType(type);
         }
       }

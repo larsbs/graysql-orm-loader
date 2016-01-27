@@ -85,9 +85,39 @@ module.exports = function (makeORMLoader) {
       });
       it('should generate a complete relay schema when options.relay is true');
       it('should generate a valid schema when options.relay is true');
-      it('should not generate create mutations when options.mutations.create is false');
-      it('should not generate update mutations when options.mutations.update is false');
-      it('should not generate delete mutations when options.mutations.delete is false');
+      it('should not generate create mutations when options.mutations.create is false', function () {
+        GQL.loadFromMockORM({
+          mutations: {
+            create: false
+          }
+        });
+        const Schema = GQL.generateSchema();
+        const expected = GraphQLUtils.printSchema(TestSchema.Schema).replace(/\n^\s+create.*$/gm, '');
+        const result = GraphQLUtils.printSchema(Schema);
+        expect(result).to.equal(expected);
+      });
+      it('should not generate update mutations when options.mutations.update is false', function () {
+        GQL.loadFromMockORM({
+          mutations: {
+            update: false
+          }
+        });
+        const Schema = GQL.generateSchema();
+        const expected = GraphQLUtils.printSchema(TestSchema.Schema).replace(/\n^\s+update.*$/gm, '');
+        const result = GraphQLUtils.printSchema(Schema);
+        expect(result).to.equal(expected);
+      });
+      it('should not generate delete mutations when options.mutations.delete is false', function () {
+        GQL.loadFromMockORM({
+          mutations: {
+            delete: false
+          }
+        });
+        const Schema = GQL.generateSchema();
+        const expected = GraphQLUtils.printSchema(TestSchema.Schema).replace(/\n^\s+delete.*$/gm, '');
+        const result = GraphQLUtils.printSchema(Schema);
+        expect(result).to.equal(expected);
+      });
     });
   });
 
