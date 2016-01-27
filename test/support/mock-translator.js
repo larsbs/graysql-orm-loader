@@ -1,6 +1,7 @@
 'use strict';
 
 const deepFreeze = require('deep-freeze');
+const DB = require('./db');
 
 
 function parseTypeToGraysQL(type) {
@@ -75,9 +76,11 @@ class MockTranslator {
   }
 
   resolveById(modelName) {
+    return (root, args) => this._models[modelName].findById(args.id);
   }
 
   resolveAll(modelName) {
+    return (root, args) => this._models[modelName].findAll();
   }
 
   resolveCreate(modelName) {

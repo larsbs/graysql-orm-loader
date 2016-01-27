@@ -17,7 +17,7 @@ module.exports = function (name, translator) {
     throw new TypeError(`Invalid translator received. A translator must implement the Translators API.`);
   }
 
-  return GraysQL => {
+  return (/* GraysQL */) => {
 
     function _getMutationsForModel(modelName) {
       const createObj = {
@@ -64,7 +64,7 @@ module.exports = function (name, translator) {
       const modelProperties = translator.parseModelProperties(modelName);
       const modelAssociations = translator.parseModelAssociations(modelName);
 
-      return GQL => ({
+      return (/* GQL */) => ({
         name: Utils.capitalize(modelName),
         fields: Object.assign({}, modelProperties, modelAssociations),
         queries: _getQueriesForModel(modelName),

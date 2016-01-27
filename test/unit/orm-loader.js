@@ -47,17 +47,17 @@ module.exports = function (makeORMLoader) {
         const result = GraphQLUtils.printSchema(GQL.generateSchema());
         expect(result).to.equal(expected);
       });
-      it.skip('should generate a valid schema', function (done) {
-        GQL.loadFromORM(new MockTranslator(MockModels));
+      it('should generate a valid schema', function (done) {
+        GQL.loadFromMockORM();
         const Schema = GQL.generateSchema();
-        const query = `query getUser {
+        const query = `query GetUser {
           user(id: 1) {
             id,
             nick,
             group {
               id,
               name,
-              members: {
+              members {
                 id
               }
             }

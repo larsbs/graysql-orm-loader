@@ -1,5 +1,8 @@
 'use strict';
 
+const DB = require('./db');
+
+
 module.exports = {
   Group: {
     attributes: {
@@ -10,6 +13,12 @@ module.exports = {
       members: {
         hasMany: 'User'
       }
+    },
+    findById(id) {
+      return DB.getGroup(id);
+    },
+    findAll() {
+      return DB.getGroups();
     }
   },
   User: {
@@ -21,6 +30,12 @@ module.exports = {
       group: {
         belongsTo: 'Group'
       }
+    },
+    findById(id) {
+      return DB.getUser(id);
+    },
+    findAll() {
+      return DB.getUsers();
     }
   }
 };
