@@ -100,7 +100,7 @@ expect(result).to.deep.equal(expected);
 ```
 
 #### `parseModelProperties(modelName)` ####
-> Returns the parsed properties of the model indicated with the modelName
+> Returns the parsed properties of the model indicated with  `modelName`
 > argument. Only the properties are parsed here, ignore the relationships.
 > The returned properties object should be an object with keys as the names of [GraysQL Types](http://github.com/larsbs/graysql#Type) fields, and the value as the fields.
 
@@ -123,7 +123,7 @@ expect(result).to.deep.equal(expected);
 ```
 
 #### `parseModelAssociations(modelName)` ####
-> Returns the parsed associations of the model indicated with the modelName
+> Returns the parsed associations of the model indicated with `modelName`
 > argument. ONly the associations are parsed here, ignore the properties.
 > The returned associations object should be an object with keys as the names of [GraysQL Types](http://github.com/larsbs/graysql#Type) fields, and the value as the fields.
 
@@ -143,25 +143,159 @@ expect(result).to.deep.equal(expected);
 ```
 
 #### `getArgsForCreate(modelName)` ####
+> Should return an object containing the necessary arguments to create a new entity of the model indicated with `modelName`. The keys of the object are the arguments names and the values are the arguments types.
+
+ * **Parameters**
+   * `modelName` *String*: The name of the model from which get the arguments.
+ * **Returns**
+   * *Object*: The necessary arguments to create a new entity.
+
+```javascript
+const expected = {
+  nick: {
+    type: 'String!'  // The nick of the user that it's about to be created
+  }
+};
+const result = translator.getArgsForCreate('User');
+expect(result).to.deep.equal(expected);
+```
 
 #### `getArgsForUpdate(modelName)` ####
+> Should return an object containing the necessary arguments to update an entity of the model indicated with modelName. The keys of the object are the arguments names and the values are the arguments types.
+
+ * **Parameters**
+   * `modelName` *String*: The name of the model from which get the arguments.
+ * **Returns**
+   * *Object*: The necessary arguments to update an entity.
+
+```javascript
+const expected = {
+  id: {
+    type: 'Int!',
+  },
+  nick: {
+    type: 'String!'  // The new nick of the user
+  }
+};
+const result = translator.getArgsForUpdate('User');
+expect(result).to.deep.equal(expected);
+```
 
 #### `getArgsForDelete(modelName)` ####
+> Should return an object containing the necessary arguments to delete an entity of the model indicated with modelName. The keys of the object are the arguments names and the values are the arguments types.
+
+ * **Parameters**
+   * `modelName` *String*: The name of the model from which get the arguments.
+ * **Returns**
+   * *Object*: The necessary arguments to delete an entity.
+
+```javascript
+const expected = {
+  id: {
+    type: 'Int!',
+  }
+};
+const result = translator.getArgsForDelete('User');
+expect(result).to.deep.equal(expected);
+```
 
 #### `resolveById(modelName)` ####
+> Should return a function that takes the same parameters as a `resolve` function from [GraphQL](http://graphql.org/) and returns the resolved entity by id. The id of the entity to returns is in the `args` parameter.
+
+ * **Parameters**
+   * `modelName` *String*: The name of the model from which resolve the entity.
+ * **Returns**
+   * *Function*: The resolve function.
+
+```javascript
+const expected = (root, args) => DB.getUser(args.id);
+const result = translator.resolveById('User');
+expect(result).to.equal(expected);
+```
 
 #### `resolveAll(modelName)` ####
+> Should return a function that takes the same parameters as a `resolve` function from [GraphQL](http://graphql.org/) and returns all the entities of the model.
+
+ * **Parameters**
+   * `modelName` *String*: The name of the model from which resolve the entities.
+ * **Returns**
+   * *Function*: The resolve function.
+
+```javascript
+const expected = (root, args) => DB.getUsers();
+const result = translator.resolveAll('User');
+expect(result).to.equal(expected);
+```
 
 #### `resolveCreate(modelName)` ####
+> Should return a function that takes the same parameters as a `resolve` function from [GraphQL](http://graphql.org/) and creates a new entity of the model.
+
+ * **Parameters**
+   * `modelName` *String*: The name of the model from which create the entity.
+ * **Returns**
+   * *Function*: The resolve function.
+
+```javascript
+const expected = (root, args) => DB.createUser(args.nick);
+const result = translator.resolveCreate('User');
+expect(result).to.equal(expected);
+```
 
 #### `resolveUpdate(modelName)` ####
+> Should return a function that takes the same parameters as a `resolve` function from [GraphQL](http://graphql.org/) and updates an entity of the model.
+
+ * **Parameters**
+   * `modelName` *String*: The name of the model from which update the entity.
+ * **Returns**
+   * *Function*: The resolve function.
+
+```javascript
+const expected = (root, args) => DB.updateUser(args.id, args.nick);
+const result = translator.resolveUpdate('User');
+expect(result).to.equal(expected);
+```
 
 #### `resolveDelete(modelName)` ####
+> Should return a function that takes the same parameters as a `resolve` function from [GraphQL](http://graphql.org/) and deletes an entity of the model.
+
+ * **Parameters**
+   * `modelName` *String*: The name of the model from which delete the entity.
+ * **Returns**
+   * *Function*: The resolve function.
+
+```javascript
+const expected = (root, args) => DB.deleteUser(args.id);
+const result = translator.resolveDelete('User');
+expect(result).to.equal(expected);
+```
 
 #### `resolveNodeId(modelName)` ####
+> Should return a function that takes an id as parameter and returns an entity with the same id of the model specified with `modelName`. Only used if the option `option.relay` is set to `true`.
+
+ * **Parameters**
+   * `modelName` *String*: The name of the model from which get the entity.
+ * **Returns**
+   * *Function*: The nodeId function.
+
+```javascript
+const expected = (id) => DB.getUser(id);
+const result = translator.resolveNodeId('User');
+expect(result).to.equal(expected);
+```
 
 ### `resolveIsTypeOf(modelName)` ####
+> Should return a function that takes an object as parameter and returns `true` or `false` depending of the type of the object. Is the same as the function `isTypeOf` of GraphQL.
 
+ * **Parameters**
+   * `modelName` *String*: The name of the model from which resolve the type.
+ * **Returns**
+   * *Function*: The isTypeOf function.
+
+```javascript
+const expected = (obj) => obj instanceof DB.User;
+const result = translator.resolveIsTypeOf('User');
+expect(result).to.equal(expected);
+```
 
 ## Examples ##
 
