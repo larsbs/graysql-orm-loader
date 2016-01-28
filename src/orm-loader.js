@@ -4,117 +4,117 @@ const pluralize = require('pluralize');
 const Utils = require('./utils');
 
 
-module.exports = function (name, translator) {
-  if ( ! translator || typeof translator !== 'object' || Array.isArray(translator)) {
-    throw new TypeError(`Expected translator to be an object, got ${typeof translator} instead`);
-  }
+function _setDefaults(options) {
+  options = Object.assign({
+    relay: false,
+    mutations: {}
+  }, options);
+  options.mutations = Object.assign({
+    create: true,
+    update: true,
+    delete: true
+  }, options.mutations);
+  return options;
+}
 
-  if ( ! name || typeof name !== 'string') {
-    throw new TypeError(`Expected name to be a string, go ${typeof name} instead`);
-  }
 
-  if ( ! Utils.isValidTranslator(translator)) {
-    throw new TypeError(`Invalid translator received. A translator must implement the Translators API.`);
-  }
+module.exports = (/* GraysQL */) => {
 
-  return (/* GraysQL */) => {
+  let _translator;
 
-    function _setDefaults(options) {
-      options = Object.assign({
-        relay: false,
-        mutations: {}
-      }, options);
-      options.mutations = Object.assign({
-        create: true,
-        update: true,
-        delete: true
-      }, options.mutations);
-      return options;
-    }
+  function _getMutationsForModel(modelName, mutationsOptions) {
+    const mutations = {};
 
-    function _getMutationsForModel(modelName, mutationsOptions) {
-      const mutations = {};
-
-      if (mutationsOptions.create) {
-        mutations[`create${Utils.capitalize(modelName)}`] = {
-          type: Utils.capitalize(modelName),
-          args: translator.getArgsForCreate(modelName),
-          resolve: translator.resolveCreate(modelName)
-        };
-      }
-      if (mutationsOptions.update) {
-        mutations[`update${Utils.capitalize(modelName)}`] = {
-          type: Utils.capitalize(modelName),
-          args: translator.getArgsForUpdate(modelName),
-          resolve: translator.resolveUpdate(modelName)
-        };
-      }
-      if (mutationsOptions.delete) {
-        mutations[`delete${Utils.capitalize(modelName)}`] = {
-          type: Utils.capitalize(modelName),
-          args: translator.getArgsForDelete(modelName),
-          resolve: translator.resolveDelete(modelName)
-        };
-      }
-
-      return mutations;
-    }
-
-    function _getQueriesForModel(modelName) {
-      const findOne = {
+    if (mutationsOptions.create) {
+      mutations[`create${Utils.capitalize(modelName)}`] = {
         type: Utils.capitalize(modelName),
-        args: {
-          id: { type: 'Int!' }
-        },
-        resolve: translator.resolveById(modelName)
+        args: _translator.getArgsForCreate(modelName),
+        resolve: _translator.resolveCreate(modelName)
       };
-      const findAll = {
+    }
+    if (mutationsOptions.update) {
+      mutations[`update${Utils.capitalize(modelName)}`] = {
         type: Utils.capitalize(modelName),
-        resolve: translator.resolveAll(modelName)
+        args: _translator.getArgsForUpdate(modelName),
+        resolve: _translator.resolveUpdate(modelName)
       };
-      return {
-        [modelName.toLowerCase()]: findOne,
-        [pluralize(modelName.toLowerCase())]: findAll
+    }
+    if (mutationsOptions.delete) {
+      mutations[`delete${Utils.capitalize(modelName)}`] = {
+        type: Utils.capitalize(modelName),
+        args: _translator.getArgsForDelete(modelName),
+        resolve: _translator.resolveDelete(modelName)
       };
     }
 
-    function _getTypeFromModel(modelName, options) {
-      const modelProperties = translator.parseModelProperties(modelName);
-      const modelAssociations = translator.parseModelAssociations(modelName, options.relay);
+    return mutations;
+  }
 
-      let type = {
-        name: Utils.capitalize(modelName),
-        fields: Object.assign({}, modelProperties, modelAssociations),
-        queries: _getQueriesForModel(modelName),
-        mutations: _getMutationsForModel(modelName, options.mutations)
-      };
-
-      if (options.relay) {
-        type = Object.assign({}, type, {
-          interfaces: ['Node'],
-          nodeId: translator.resolveNodeId(modelName),
-          isTypeOf: translator.resolveIsTypeOf(modelName)
-        });
-      }
-
-      return (/* GQL */) => type;
-    }
-
+  function _getQueriesForModel(modelName) {
+    const findOne = {
+      type: Utils.capitalize(modelName),
+      args: {
+        id: { type: 'Int!' }
+      },
+      resolve: _translator.resolveById(modelName)
+    };
+    const findAll = {
+      type: Utils.capitalize(modelName),
+      resolve: _translator.resolveAll(modelName)
+    };
     return {
-      ['loadFrom' + Utils.capitalize(name) + 'ORM'](opts) {
-        const modelsNames = translator.getModelsNames();  // [ ModelName, ModelName2, ... ]
-        const options = _setDefaults(opts);
+      [modelName.toLowerCase()]: findOne,
+      [pluralize(modelName.toLowerCase())]: findAll
+    };
+  }
 
-        if (options.relay) {
-          // TODO: Add a method to check if Graylay is enabled, and if not, throw an Error
-        }
+  function _getTypeFromModel(modelName, options) {
+    const modelProperties = _translator.parseModelProperties(modelName);
+    const modelAssociations = _translator.parseModelAssociations(modelName, options.relay);
 
-        for (const modelName of modelsNames) {
-          const type = _getTypeFromModel(modelName, options);
-          this.registerType(type);
-        }
-      }
+    let type = {
+      name: Utils.capitalize(modelName),
+      fields: Object.assign({}, modelProperties, modelAssociations),
+      queries: _getQueriesForModel(modelName),
+      mutations: _getMutationsForModel(modelName, options.mutations)
     };
 
+    if (options.relay) {
+      type = Object.assign({}, type, {
+        interfaces: ['Node'],
+        nodeId: _translator.resolveNodeId(modelName),
+        isTypeOf: _translator.resolveIsTypeOf(modelName)
+      });
+    }
+
+    return (/* GQL */) => type;
+  }
+
+  return {
+    loadFromORM(translator, opts) {
+      if ( ! translator || typeof translator !== 'object' || Array.isArray(translator)) {
+        throw new TypeError(`Expected translator to be an object, got ${typeof translator} instead`);
+      }
+
+      if ( ! Utils.isValidTranslator(translator)) {
+        throw new TypeError(`Invalid translator received. A translator must implement the Translators API.`);
+      }
+
+      _translator = translator;
+
+      const modelsNames = translator.getModelsNames();  // [ ModelName, ModelName2, ... ]
+      const options = _setDefaults(opts);
+
+      if (options.relay) {
+        // TODO: Add a method to check if Graylay is enabled, and if not, throw an Error
+      }
+
+      for (const modelName of modelsNames) {
+        const type = _getTypeFromModel(modelName, options);
+        this.registerType(type);
+      }
+    }
+
   };
+
 };
