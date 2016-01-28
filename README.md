@@ -39,35 +39,44 @@ console.log(Schema);
 
 ## Overview ##
 
-The main object in the GraysQL ORM Loader extension is a translator. A translator is a class that transforms a series of models of an ORM into compatible types, queries and mutations with [GraysQL]() in order to create a [GraphQL schema]().
-The automatically types, queries and mutations created are the following ones:
+In order to load a Schema from the ORM you will need a translator. Then, this
+library will use that translator to retrieve the necessary information from
+the ORM and load it into [GraysQL](https://github.com/larsbs/graysql). This
+loader will create the following objects for each model.
 
-  * **Types**: A valid type for every model, including the relations betweens them.
-  * **Queries**:
-    * *getModelById(id)*: Get a model by its id.
-    * *getModelByCriteria(args)*: Get a model by a criteria specified in args (for example {'foo': 'bar'})
-  * **Mutations**:
-   * *createModel(args)*: A mutation for creating a model with args as attribute.
-   * *updateModel(args)*: A mutation for updating a model with args as attributes updates.
-   * *deleteModel*: A mutation for deleting a model.
+  * **Types**: A valid [GraysQL Type](https://github.com/larsbs/graysql#Types) for every model in the ORM.
+  * **Queries**: For each type created, these queries will be created too:
+    * `type(id: Int): Type`: Gets a single type by its id.
+    * `types(): [Type]`: Gets all the types.
+  * **Mutations**: For each type created, these mutations will be created too:
+   * `createType(args)`: Creates a type.
+   * `updateType(args)`: Updates a type.
+   * `deleteType(args)`: Deletes a type.
 
-You can configure which mutations will this extension create automatically. Just see the [loadFromORM]() API.
+If you don't want to create all the mutations by default, you can customize what mutations the loader will create automatically.
 
-Creating a custom translator is easy. Just create a javascript class that follows the [Translator API]().
-
-## loadFromORM ##
+### Methods ###
 
 This extension adds the following method to GraysQL.
 
-#### `GQL.loadFromORM(translator[, options])` ####
-> Receives an instance of an ORM Translator with its corresponding models and automatically creates valid types, queries and mutations in GraysQL.
+#### `GQL.loadFromORM(translator, [options])` ####
+> Receives an instance of an ORM Translator and will use this translator to
+> load all the models into GraysQL.
 
 * **Parameters**:
-  * `translator` *Object*: An instance of a valid translator for GraysQL ORM Loader.
-  * `options` *Object*:  An object to configure the mutations which this extension will automatically create. The available options are:
-    * `createMutation: true|false`. This option indicates if a createMutation must be created. By default *True*
-    * `updateMutation: true|false`. This option indicates if a updateMutation must be created. By default *True*
-    * `deleteMutation: true|false`. This option indicates if a deleteMutation must be created. By default *True*
+  * `translator` *Object*: An instance of a valid translator.
+  * `options` *Object*:  A configuration object with the following keys and default values:
+
+  ```javascript
+  {
+    relay: false,  // Create valid relay types instead of default ones.
+    mutations: {
+      create: true,  // Indicates if a create mutation shoud be created.
+      update: true,  // Indicates if a update mutation should be creted.
+      delete: true   // Indicates if a delete mutation should be created.
+    }
+  }
+  ```
 
 ## Translators API ##
 
@@ -83,6 +92,12 @@ The tests are written with [mocha](https://mochajs.org) and can be run with the 
 
 ```bash
 $ npm test
+```
+
+To get a code coverage report, run the following command:
+
+```bash
+$ npm run cover
 ```
 
 ## License ##
