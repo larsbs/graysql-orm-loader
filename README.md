@@ -44,7 +44,7 @@ library will use that translator to retrieve the necessary information from
 the ORM and load it into [GraysQL](https://github.com/larsbs/graysql). This
 loader will create the following objects for each model.
 
-  * **Types**: A valid [GraysQL Type](https://github.com/larsbs/graysql#Types) for every model in the ORM.
+  * **Types**: A valid [GraysQL Type](https://github.com/larsbs/graysql#Type) for every model in the ORM.
   * **Queries**: For each type created, these queries will be created too:
     * `type(id: Int): Type`: Gets a single type by its id.
     * `types(): [Type]`: Gets all the types.
@@ -80,7 +80,88 @@ This extension adds the following method to GraysQL.
 
 ## Translators API ##
 
-*TODO*
+A translator is simply an object that implements certain methods. As long as
+the result is this object, it can be a class, a raw object, a function, etc.
+There is a [mock translator](test/support/mock-translator.js) in the tests folder that you can take as example. Usually, but not necessarily, a translator
+implements a method to receive the models that it should translate from.
+
+The methods that translators must implement are:
+
+#### `getModelsNames()` ####
+> Returns an array with the name of all the models in the translators.
+
+ * **Returns**
+   * *Array: String*: An array containing the names of the models inside the translator.
+
+```javascript
+const expected = ['Group', 'User'];
+const result = translator.getModelsNames();
+expect(result).to.deep.equal(expected);
+```
+
+#### `parseModelProperties(modelName)` ####
+> Returns the parsed properties of the model indicated with the modelName
+> argument. Only the properties are parsed here, ignore the relationships.
+> The returned properties object should be an object with keys as the names of [GraysQL Types](http://github.com/larsbs/graysql#Type) fields, and the value as the fields.
+
+ * **Parameters**
+   * `modelName` *String*: The name of the model to parse.
+ * **Returns**
+   * *Object*: An object containing the parsed properties.
+
+```javascript
+const expected = {
+  id: {
+    type: 'Int'
+  },
+  nick: {
+    type: 'String'
+  }
+};
+const result = translator.parseModelProperties('User');
+expect(result).to.deep.equal(expected);
+```
+
+#### `parseModelAssociations(modelName)` ####
+> Returns the parsed associations of the model indicated with the modelName
+> argument. ONly the associations are parsed here, ignore the properties.
+> The returned associations object should be an object with keys as the names of [GraysQL Types](http://github.com/larsbs/graysql#Type) fields, and the value as the fields.
+
+* **Parameters**
+  * `modelName` *String*: The name of the model to parse.
+* **Returns**
+  * *Object*: An object containing the parsed associations.
+
+```javascript
+const expected = {
+  members: {
+    tye: '[User]'
+  }
+};
+const result = translator.parseModelAssociations('Group');
+expect(result).to.deep.equal(expected);
+```
+
+#### `getArgsForCreate(modelName)` ####
+
+#### `getArgsForUpdate(modelName)` ####
+
+#### `getArgsForDelete(modelName)` ####
+
+#### `resolveById(modelName)` ####
+
+#### `resolveAll(modelName)` ####
+
+#### `resolveCreate(modelName)` ####
+
+#### `resolveUpdate(modelName)` ####
+
+#### `resolveDelete(modelName)` ####
+
+#### `resolveNodeId(modelName)` ####
+
+### `resolveIsTypeOf(modelName)` ####
+
 
 ## Examples ##
 
