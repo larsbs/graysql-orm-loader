@@ -15,6 +15,10 @@ $ npm install graysql-ext-orm-loader
 
 Note that this is an extension for GraysQL, so you must have it installed in order for this to work.
 
+## Translators ##
+
+ * [graysql-orm-loader-waterline](https://github.com/larsbs/graysql-orm-loader-waterline): A translator to get the schema from Waterline models.
+
 ## Example ##
 
 Here is a simple example using [Sails.js](http://sailsjs.org/) with [Waterline](https://github.com/balderdashy/waterline) as the ORM.
