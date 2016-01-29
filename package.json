@@ -20,7 +20,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/larsbs/graysql.git"
+    "url": "https://github.com/larsbs/graysql-orm-loader.git"
   },
   "peerDependencies": {
     "graysql": "^0.3.1"
