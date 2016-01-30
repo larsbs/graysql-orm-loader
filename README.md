@@ -321,7 +321,7 @@ $ npm run cover
 
 ## TODO ##
 
-[ ] - Use GraphQLInputType for mutations instead of passing arguments one by one.
+ - [ ] - Use GraphQLInputType for mutations instead of passing arguments one by one.
 
 ## License ##
 
