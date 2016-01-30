@@ -319,6 +319,10 @@ To get a code coverage report, run the following command:
 $ npm run cover
 ```
 
+## TODO ##
+
+[ ] - Use GraphQLInputType for mutations instead of passing arguments one by one.
+
 ## License ##
 
 [MIT](LICENSE)
