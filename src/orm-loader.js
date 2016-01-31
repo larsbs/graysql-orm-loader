@@ -27,21 +27,21 @@ module.exports = (/* GraysQL */) => {
 
     if (mutationsOptions.create) {
       mutations[`create${Utils.capitalize(modelName)}`] = {
-        type: Utils.capitalize(modelName),
+        type: modelName,
         args: _translator.getArgsForCreate(modelName),
         resolve: _translator.resolveCreate(modelName)
       };
     }
     if (mutationsOptions.update) {
       mutations[`update${Utils.capitalize(modelName)}`] = {
-        type: Utils.capitalize(modelName),
+        type: modelName,
         args: _translator.getArgsForUpdate(modelName),
         resolve: _translator.resolveUpdate(modelName)
       };
     }
     if (mutationsOptions.delete) {
       mutations[`delete${Utils.capitalize(modelName)}`] = {
-        type: Utils.capitalize(modelName),
+        type: modelName,
         args: _translator.getArgsForDelete(modelName),
         resolve: _translator.resolveDelete(modelName)
       };
@@ -52,14 +52,14 @@ module.exports = (/* GraysQL */) => {
 
   function _getQueriesForModel(modelName) {
     const findOne = {
-      type: Utils.capitalize(modelName),
+      type: modelName,
       args: {
         id: { type: 'Int!' }
       },
       resolve: _translator.resolveById(modelName)
     };
     const findAll = {
-      type: Utils.capitalize(modelName),
+      type: modelName,
       resolve: _translator.resolveAll(modelName)
     };
     return {
@@ -73,7 +73,7 @@ module.exports = (/* GraysQL */) => {
     const modelAssociations = _translator.parseModelAssociations(modelName, options.relay);
 
     let type = {
-      name: Utils.capitalize(modelName),
+      name: modelName,
       fields: Object.assign({}, modelProperties, modelAssociations),
       queries: _getQueriesForModel(modelName),
       mutations: _getMutationsForModel(modelName, options.mutations)
