@@ -59,7 +59,7 @@ module.exports = (/* GraysQL */) => {
       resolve: _translator.resolveById(modelName)
     };
     const findAll = {
-      type: modelName,
+      type: `[${modelName}]`,
       resolve: _translator.resolveAll(modelName)
     };
     return {

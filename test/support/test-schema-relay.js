@@ -59,7 +59,7 @@ const Query = new graphql.GraphQLObjectType({
       resolve: (_, args) => DB.getGroup(args.id)
     },
     groups: {
-      type: Group,
+      type: new graphql.GraphQLList(Group),
       resolve: (_, args) => DB.getGroups()
     },
     user: {
@@ -70,7 +70,7 @@ const Query = new graphql.GraphQLObjectType({
       resolve: (_, args) => DB.getUser(args.id)
     },
     users: {
-      type: User,
+      type: new graphql.GraphQLList(User),
       resolve: (_, args) => DB.getUsers()
     }
   })

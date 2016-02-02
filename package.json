@@ -23,14 +23,14 @@
     "url": "https://github.com/larsbs/graysql-orm-loader.git"
   },
   "peerDependencies": {
-    "graysql": "^0.3.1"
+    "graysql": "^0.4.1"
   },
   "devDependencies": {
     "chai": "^3.4.1",
     "eslint": "^1.10.3",
     "graphql": "^0.4.14",
     "graphql-relay": "^0.3.6",
-    "graysql": "^0.3.1",
+    "graysql": "^0.4.1",
     "istanbul": "^0.4.2",
     "mocha": "^2.3.4"
   },
