@@ -1,6 +1,6 @@
 {
   "name": "graysql-orm-loader",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A GraysQL extension to load a GraphQL schema from a ORM",
   "main": "index.js",
   "scripts": {
