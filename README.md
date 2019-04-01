@@ -75,8 +75,8 @@ This extension adds the following method to GraysQL.
   {
     relay: false,  // Create valid relay types instead of default ones.
     mutations: {
-      create: true,  // Indicates if a create mutation shoud be created.
-      update: true,  // Indicates if a update mutation should be creted.
+      create: true,  // Indicates if a create mutation should be created.
+      update: true,  // Indicates if a update mutation should be created.
       delete: true   // Indicates if a delete mutation should be created.
     }
   }
@@ -128,7 +128,7 @@ expect(result).to.deep.equal(expected);
 
 #### `parseModelAssociations(modelName)` ####
 > Returns the parsed associations of the model indicated with `modelName`
-> argument. ONly the associations are parsed here, ignore the properties.
+> argument. Only the associations are parsed here, ignore the properties.
 > The returned associations object should be an object with keys as the names of [GraysQL Types](http://github.com/larsbs/graysql#Type) fields, and the value as the fields.
 
 * **Parameters**
